@@ -124,9 +124,9 @@ def main():
                 insert += 1
     problem.plot(solution)
     print(problem.evaluate_solution(solution))
-    print("number of swaps offspirng selected =")
+    print("number of swaps offspring selected =")
     print(swap)
-    print("number of insert offspirng selected =")
+    print("number of insert offspring selected =")
     print(insert)
 
 

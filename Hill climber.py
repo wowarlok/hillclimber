@@ -6,7 +6,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 NUM_CITIES = 23
-STEADY_STATE = 1000
+STEADY_STATE = 10000
 
 
 class Tsp:
@@ -61,15 +61,10 @@ def tweak_insert(solution: np.array, *, pm: float = .1) -> np.array:
         i2 = np.random.randint(0, solution.shape[0])
         if i1 > i2:
             i1, i2 = i2, i1
-        # swap 2 nodes
-        # for index in range(int((i2-i1)/2)):
-        #   new_solution[index+i1], new_solution[i2-index]= new_solution[i2-index], new_solution[index+i1]
+        # selects a node and puts it in a selected location
         for index in range(i2 - i1):
             new_solution[i1 + index], new_solution[i1 + index + 1] = new_solution[i1 + index + 1], new_solution[
                 i1 + index]
-        # temp = new_solution[i1]
-        # new_solution[i1] = new_solution[i2]
-        # new_solution[i2] = temp
         p = np.random.random()
     return new_solution
 
@@ -85,11 +80,6 @@ def tweak_swap(solution: np.array, *, pm: float = .1) -> np.array:
         # swap 2 nodes
         for index in range(int((i2 - i1) / 2)):
             new_solution[index + i1], new_solution[i2 - index] = new_solution[i2 - index], new_solution[index + i1]
-        # for index in range (i2-i1):
-        #    new_solution[i1+index], new_solution[i1+index+1] = new_solution[i1+index+1], new_solution[i1+index]
-        # temp = new_solution[i1]
-        # new_solution[i1] = new_solution[i2]
-        # new_solution[i2] = temp
         p = np.random.random()
     return new_solution
 

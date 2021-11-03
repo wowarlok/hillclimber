@@ -5,8 +5,7 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 
-
-NUM_CITIES = 55
+NUM_CITIES = 23
 STEADY_STATE = 10000
 
 
@@ -80,14 +79,15 @@ def tweak_insert(solution: np.array, *, pm: float = .1) -> np.array:
         for index in range(i2 - i1):
             new_solution[i1 + index], new_solution[i1 + index + 1] = new_solution[i1 + index + 1], new_solution[
                 i1 + index]
-        #else:
+        # else:
         #    for index in range(i1 - i2):
         #        new_solution[i1 - index], new_solution[i1 - index - 1] = new_solution[i1 - index - 1], new_solution[
         #            i1 - index]
         p = np.random.random()
     return new_solution
 
-def tweak_insert2(solution: np.array, *, pm: float = .1) -> [np.array,np.array]:
+
+def tweak_insert2(solution: np.array, *, pm: float = .1) -> [np.array, np.array]:
     new_solution1 = solution.copy()
     new_solution2 = solution.copy()
     p = None
@@ -105,7 +105,7 @@ def tweak_insert2(solution: np.array, *, pm: float = .1) -> [np.array,np.array]:
             new_solution2[i1 - index], new_solution2[i1 - index - 1] = new_solution2[i1 - index - 1], new_solution2[
                 i1 - index]
         p = np.random.random()
-    return new_solution1,new_solution2
+    return new_solution1, new_solution2
 
 
 def tweak_swap(solution: np.array, *, pm: float = .1) -> np.array:
@@ -138,14 +138,13 @@ def main():
     steady_state = 0
     step = 0
     while steady_state < STEADY_STATE:
-        new_solution_cost = 0
-        new_solution= solution
+
         step += 1
         steady_state += 1
-        new_solution_swap=( tweak_swap(solution, pm=.5))
+        new_solution_swap = (tweak_swap(solution, pm=.5))
 
         new_solution_insert0 = tweak_insert(solution, pm=.85)
-        new_solution_insert,new_solution_insert2 = tweak_insert2(solution, pm=.85)
+        new_solution_insert, new_solution_insert2 = tweak_insert2(solution, pm=.85)
         new_solution_cost_swap = problem.evaluate_solution(new_solution_swap)
         new_solution_cost_insert0 = problem.evaluate_solution(new_solution_insert0)
         new_solution_cost_insert = problem.evaluate_solution(new_solution_insert)

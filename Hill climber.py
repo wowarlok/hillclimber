@@ -5,7 +5,8 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 
-NUM_CITIES = 23
+
+NUM_CITIES = 55
 STEADY_STATE = 10000
 
 
@@ -25,6 +26,20 @@ class Tsp:
         pos2 = self._graph.nodes[n2]['pos']
         return round(1_000_000 / self._num_cities * sqrt((pos1[0] - pos2[0]) ** 2 +
                                                          (pos1[1] - pos2[1]) ** 2))
+
+    def find_longest(self, solution: np.array) -> [int, int]:
+        max_cost = 0
+        out1 = 0
+        out2 = 0
+        tmp = solution.tolist() + [solution[0]]
+        for n1, n2 in (tmp[i:i + 2] for i in range(len(tmp) - 1)):
+            cost = self.distance(n1, n2)
+            if cost > max_cost:
+                max_cost = cost
+                out1 = n1
+                out2 = n2
+
+        return out1, out2
 
     def evaluate_solution(self, solution: np.array) -> float:
         total_cost = 0
@@ -65,8 +80,32 @@ def tweak_insert(solution: np.array, *, pm: float = .1) -> np.array:
         for index in range(i2 - i1):
             new_solution[i1 + index], new_solution[i1 + index + 1] = new_solution[i1 + index + 1], new_solution[
                 i1 + index]
+        #else:
+        #    for index in range(i1 - i2):
+        #        new_solution[i1 - index], new_solution[i1 - index - 1] = new_solution[i1 - index - 1], new_solution[
+        #            i1 - index]
         p = np.random.random()
     return new_solution
+
+def tweak_insert2(solution: np.array, *, pm: float = .1) -> [np.array,np.array]:
+    new_solution1 = solution.copy()
+    new_solution2 = solution.copy()
+    p = None
+    while p is None or p < pm:
+        i1 = np.random.randint(0, solution.shape[0])
+        i2 = np.random.randint(0, solution.shape[0])
+        if i1 > i2:
+            i1, i2 = i2, i1
+        # selects a node and puts it in a selected location
+        for index in range(i2 - i1):
+            new_solution1[i1 + index], new_solution1[i1 + index + 1] = new_solution1[i1 + index + 1], new_solution1[
+                i1 + index]
+        i1, i2 = i2, i1
+        for index in range(i1 - i2):
+            new_solution2[i1 - index], new_solution2[i1 - index - 1] = new_solution2[i1 - index - 1], new_solution2[
+                i1 - index]
+        p = np.random.random()
+    return new_solution1,new_solution2
 
 
 def tweak_swap(solution: np.array, *, pm: float = .1) -> np.array:
@@ -99,12 +138,24 @@ def main():
     steady_state = 0
     step = 0
     while steady_state < STEADY_STATE:
+        new_solution_cost = 0
+        new_solution= solution
         step += 1
         steady_state += 1
-        new_solution_swap = tweak_swap(solution, pm=.5)
-        new_solution_insert = tweak_insert(solution, pm=.85)
+        new_solution_swap=( tweak_swap(solution, pm=.5))
+
+        new_solution_insert0 = tweak_insert(solution, pm=.85)
+        new_solution_insert,new_solution_insert2 = tweak_insert2(solution, pm=.85)
         new_solution_cost_swap = problem.evaluate_solution(new_solution_swap)
+        new_solution_cost_insert0 = problem.evaluate_solution(new_solution_insert0)
         new_solution_cost_insert = problem.evaluate_solution(new_solution_insert)
+        new_solution_cost_insert2 = problem.evaluate_solution(new_solution_insert2)
+        if new_solution_cost_insert2 < new_solution_cost_insert:
+            new_solution_insert = new_solution_insert2
+            new_solution_cost_insert = new_solution_cost_insert2
+            if new_solution_cost_insert0 < new_solution_cost_insert:
+                new_solution_insert = new_solution_insert0
+                new_solution_cost_insert = new_solution_cost_insert0
         if new_solution_cost_swap < new_solution_cost_insert:
             new_solution_cost = new_solution_cost_swap
             new_solution = new_solution_swap
@@ -122,6 +173,7 @@ def main():
                 swap += 1
             else:
                 insert += 1
+
     problem.plot(solution)
     print(problem.evaluate_solution(solution))
     print("number of swaps offspring selected =")
